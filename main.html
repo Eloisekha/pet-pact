@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Pact - Timer</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+      body {
+        background: #e0e5ec;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      /* SMALLER PHONE FRAME */
+      .phone-frame {
+        width: 320px;
+        height: 640px;
+        background: #000;
+        border-radius: 36px;
+        padding: 10px;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+      .phone-notch {
+        width: 130px;
+        height: 22px;
+        background: #000;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+      }
+
+      /* MAIN SCREEN */
+      .app-screen {
+        width: 100%;
+        height: 100%;
+        background: #b4c5e4;
+        border-radius: 28px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: relative; /* for menu drawer */
+      }
+
+      .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 35px 20px 10px;
+      }
+      .menu-btn {
+        background: none;
+        border: none;
+        font-size: 22px;
+        font-weight: 800;
+        color: #2c3e50;
+        cursor: pointer;
+      }
+
+      .streak-badge {
+        background: #fdfbf7;
+        padding: 5px 12px;
+        border-radius: 18px;
+        font-size: 13px;
+        font-weight: 800;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .streak-badge i {
+        color: #f4a460;
+      }
+
+      .timer-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 20px;
+      }
+
+      .focus-tag {
+        background: #f4a460;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 800;
+        padding: 7px 16px;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .pet-wrapper {
+        position: relative;
+        width: 230px;
+        height: 230px;
+        margin-bottom: 20px;
+      }
+
+      .progress-ring {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: rotate(-90deg);
+      }
+      .progress-ring__bg {
+        fill: none;
+        stroke: rgba(255, 255, 255, 0.4);
+        stroke-width: 12;
+      }
+      .progress-ring__value {
+        fill: none;
+        stroke: #f4a460;
+        stroke-width: 12;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 4px rgba(244, 164, 96, 0.5));
+        stroke-dasharray: 0 999;
+        transition: stroke-dashoffset 0.35s, stroke 0.3s;
+      }
+
+      .pet-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.55);
+        border: 7px solid rgba(255, 255, 255, 0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: 0.3s;
+      }
+      .pet-circle.active {
+        box-shadow: 0 0 26px rgba(244, 164, 96, 0.6);
+        background: rgba(255, 255, 255, 0.95);
+      }
+      .pet-placeholder {
+        font-size: 72px;
+      }
+
+      .timer-text {
+        font-size: 52px;
+        font-weight: 800;
+        color: #2c3e50;
+        margin-bottom: 18px;
+      }
+
+      .action-btn {
+        width: 180px;
+        padding: 15px;
+        border: none;
+        border-radius: 28px;
+        font-size: 16px;
+        font-weight: 900;
+        cursor: pointer;
+        transition: 0.15s;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+      }
+      .btn-start {
+        background: #a8d5ba;
+        color: #2c3e50;
+      }
+      .btn-resume {
+        background: #eedc82;
+        color: #2c3e50;
+      }
+      .btn-giveup {
+        background: #e57373;
+        color: #fff;
+      }
+
+      /* RESUME + END UI buttons */
+      #resumeEndRow {
+        display: none;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 12px;
+        width: 210px;
+      }
+
+      .resume-big,
+      .end-big {
+        flex: 1;
+        padding: 14px;
+        border-radius: 24px;
+        font-size: 16px;
+        font-weight: 900;
+        border: none;
+        cursor: pointer;
+      }
+      .resume-big {
+        background: #eedc82;
+        color: #2c3e50;
+      }
+      .end-big {
+        background: #e57373;
+        color: white;
+      }
+
+      /* POPUP THEME */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(44, 62, 80, 0.55);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+      }
+      .popup-box {
+        background: #fdfbf7;
+        border-radius: 22px;
+        width: 280px;
+        padding: 22px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        animation: scalePop 0.25s;
+      }
+      @keyframes scalePop {
+        from {
+          transform: scale(0.8);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      .popup-box h3 {
+        font-size: 19px;
+        font-weight: 900;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+      .popup-box p {
+        font-size: 13px;
+        color: #4a5568;
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+
+      .popup-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .popup-btn {
+        flex: 1;
+        padding: 11px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .popup-yes {
+        background: #f4a460;
+        color: #fff;
+      }
+      .popup-no {
+        background: #e0e5ec;
+        color: #2c3e50;
+      }
+
+      /* MENU DRAWER INSIDE FRAME */
+      .menu-drawer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 50;
+      }
+      .menu-drawer-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .menu-panel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 220px;
+        background: #fdfbf7;
+        box-shadow: 6px 0 18px rgba(0, 0, 0, 0.25);
+        border-radius: 28px 0 0 28px;
+        transform: translateX(-110%);
+        transition: transform 0.2s ease-out;
+        display: flex;
+        flex-direction: column;
+        padding: 28px 18px 18px;
+      }
+      .menu-drawer.open {
+        pointer-events: auto;
+      }
+      .menu-drawer.open .menu-drawer-overlay {
+        opacity: 1;
+      }
+      .menu-drawer.open .menu-panel {
+        transform: translateX(0);
+      }
+
+      .menu-title {
+        font-size: 18px;
+        font-weight: 900;
+        color: #2c3e50;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+      }
+      .menu-subtitle {
+        font-size: 11px;
+        font-weight: 700;
+        color: #718096;
+        margin-bottom: 18px;
+      }
+      .menu-close {
+        align-self: flex-end;
+        background: none;
+        border: none;
+        font-size: 18px;
+        font-weight: 900;
+        color: #2c3e50;
+        cursor: pointer;
+        margin-bottom: 8px;
+      }
+      .menu-items {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .menu-item {
+        width: 100%;
+        text-align: left;
+        border: none;
+        border-radius: 14px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        background: #edf2f7;
+        color: #2c3e50;
+      }
+      .menu-item.primary {
+        background: #a8d5ba;
+      }
+      .menu-item:hover {
+        background: #f4a460;
+        color: #fff;
+      }
+      .menu-footer {
+        margin-top: auto;
+        font-size: 10px;
+        color: #a0aec0;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="app-screen">
+        <div class="header-row">
+          <button class="menu-btn" id="menuBtn">☰</button>
+          <div class="streak-badge" id="streakBadge">
+            <i class="fa-solid fa-fire"></i>
+            <span id="streakText">0 Focus Streak</span>
+          </div>
+        </div>
+
+        <!-- SLIDE-IN MENU DRAWER -->
+        <div class="menu-drawer" id="menuDrawer">
+          <div class="menu-drawer-overlay" id="menuOverlay"></div>
+          <div class="menu-panel">
+            <button class="menu-close" id="menuClose">✕</button>
+            <div class="menu-title">PET PACT</div>
+            <div class="menu-subtitle">Your focus, your pact.</div>
+
+            <div class="menu-items">
+              <!-- Back to timer = just close drawer -->
+              <button class="menu-item primary" id="menuHome">
+                Back to Home
+              </button>
+
+              <!-- Calendar page -->
+              <button class="menu-item" id="menuCalendar">Calendar</button>
+
+              <!-- These can go to placeholder pages for now -->
+              <button class="menu-item" id="menuProfile">Profile</button>
+              <button class="menu-item" id="menuFriends">Friends</button>
+              <button class="menu-item" id="menuShop">Pet Shop</button>
+            </div>
+
+            <div class="menu-footer">v0.1 • Focus & Break Companion</div>
+          </div>
+        </div>
+
+        <div class="timer-content">
+          <div class="focus-tag" id="modeTag">
+            <i class="fa-solid fa-circle"></i> Study Mode
+          </div>
+
+          <div class="pet-wrapper">
+            <svg
+              class="progress-ring"
+              width="230"
+              height="230"
+              viewBox="0 0 260 260"
+            >
+              <circle
+                class="progress-ring__bg"
+                cx="130"
+                cy="130"
+                r="100"
+              ></circle>
+              <circle
+                class="progress-ring__value"
+                cx="130"
+                cy="130"
+                r="100"
+              ></circle>
+            </svg>
+
+            <div class="pet-circle" id="petCircle">
+              <div class="pet-placeholder" id="petFace">🐶</div>
+            </div>
+          </div>
+
+          <div class="timer-text" id="timeLeft">25:00</div>
+
+          <!-- main button -->
+          <button id="timerBtn" class="action-btn btn-start">START</button>
+
+          <!-- buttons shown after "give up YES" -->
+          <div id="resumeEndRow">
+            <button class="resume-big" id="resumeBtn">RESUME</button>
+            <button class="end-big" id="endBtn">END</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ---------- READ TASK & MINUTES FROM LOCALSTORAGE ---------- */
+      const storedTaskName = localStorage.getItem("petpact_taskName");
+      const storedTaskMinutesStr = localStorage.getItem("petpact_taskMinutes");
+
+      /* ---------- CORE VALUES ---------- */
+      const pet = document.getElementById("petCircle");
+      const petFace = document.getElementById("petFace");
+      const timerEl = document.getElementById("timeLeft");
+      const btn = document.getElementById("timerBtn");
+      const resumeRow = document.getElementById("resumeEndRow");
+      const resumeBtn = document.getElementById("resumeBtn");
+      const endBtn = document.getElementById("endBtn");
+      const modeTag = document.getElementById("modeTag");
+      const streakTextEl = document.getElementById("streakText");
+      const progressCircle = document.querySelector(".progress-ring__value");
+
+      // ---- GLOBAL STATS SHARED WITH PROFILE ----
+      const TOTAL_MINUTES_KEY = "petpact_total_minutes";
+      const SESSION_COUNT_KEY = "petpact_session_count";
+      const BEST_STREAK_KEY = "petpact_best_streak";
+
+      // Load existing stats or default to 0
+      let totalMinutes =
+        parseInt(localStorage.getItem(TOTAL_MINUTES_KEY), 10) || 0;
+      let sessionCount =
+        parseInt(localStorage.getItem(SESSION_COUNT_KEY), 10) || 0;
+      let bestStreak = parseInt(localStorage.getItem(BEST_STREAK_KEY), 10) || 0;
+
+      // focusTotal = selected minutes * 60, or default 25 min
+      let focusTotal;
+      if (storedTaskMinutesStr) {
+        const mins = parseInt(storedTaskMinutesStr, 10);
+        if (!isNaN(mins) && mins > 0) {
+          focusTotal = mins * 60;
+        } else {
+          focusTotal = 25 * 60;
+        }
+      } else {
+        focusTotal = 25 * 60;
+      }
+
+      let total = focusTotal;
+      let remain = total;
+      let timerRunning = false;
+      let interval = null;
+
+      // Modes: "focus", "focus-paused", "break-ready", "break"
+      let mode = "focus";
+      let breakWarningShown = false;
+      let streakCount = 3;
+
+      (function initStreak() {
+        const num = parseInt(streakTextEl.textContent, 10);
+        if (!isNaN(num)) streakCount = num;
+        streakTextEl.textContent = streakCount + " Focus Streak";
+      })();
+
+      const radius = 100;
+      const circumference = 2 * Math.PI * radius;
+      progressCircle.style.strokeDasharray = `${circumference}`;
+      progressCircle.style.strokeDashoffset = circumference;
+
+      function setRing(percent) {
+        const offset = circumference - (percent / 100) * circumference;
+        progressCircle.style.strokeDashoffset = offset;
+      }
+
+      function updateTimeDisplay() {
+        const m = Math.floor(remain / 60);
+        const s = remain % 60;
+        timerEl.textContent =
+          String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+
+        const progressPercent = ((total - remain) / total) * 100;
+        setRing(progressPercent);
+      }
+
+      // initial tag text based on selected task
+      const storedSessionName = localStorage.getItem("petpact_sessionName");
+
+      // Priority:
+      // 1) friend session name
+      // 2) task name from calendar
+      // 3) default Study Mode
+      if (storedSessionName) {
+        modeTag.innerHTML = `<i class="fa-solid fa-users"></i> ${storedSessionName}`;
+      } else if (storedTaskName) {
+        modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> ${storedTaskName}`;
+      } else {
+        modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Study Mode`;
+      }
+
+      function ask(title, msg, yesFn) {
+        const pop = document.createElement("div");
+        pop.className = "popup-overlay";
+        pop.innerHTML = `
+          <div class="popup-box">
+            <h3>${title}</h3>
+            <p>${msg}</p>
+            <div class="popup-actions">
+              <button class="popup-btn popup-yes">YES</button>
+              <button class="popup-btn popup-no">NO</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(pop);
+
+        const noBtn = pop.querySelector(".popup-no");
+        const yesBtn = pop.querySelector(".popup-yes");
+
+        noBtn.onclick = () => pop.remove();
+        yesBtn.onclick = () => {
+          yesFn && yesFn();
+          pop.remove();
+        };
+      }
+
+      function resetToFocusIdle() {
+        mode = "focus";
+        timerRunning = false;
+        clearInterval(interval);
+        total = focusTotal;
+        remain = total;
+        pet.classList.remove("active");
+        progressCircle.style.stroke = "#f4a460";
+        setRing(0);
+        updateTimeDisplay();
+
+        btn.style.display = "block";
+        btn.textContent = "START";
+        btn.className = "action-btn btn-start";
+        resumeRow.style.display = "none";
+
+        if (storedSessionName) {
+          modeTag.innerHTML = `<i class="fa-solid fa-users"></i> ${storedSessionName}`;
+        } else if (storedTaskName) {
+          modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> ${storedTaskName}`;
+        } else {
+          modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Study Mode`;
+        }
+      }
+
+      function getBreakLengthSeconds() {
+        if (focusTotal < 5 * 60) return 1 * 60;
+        if (focusTotal <= 25 * 60) return 5 * 60;
+        return 20 * 60;
+      }
+
+      function tick() {
+        remain--;
+
+        if (remain <= 0) {
+          if (mode === "focus") {
+            onFocusComplete();
+          } else if (mode === "break") {
+            onBreakComplete();
+          }
+          return;
+        }
+
+        if (mode === "break") {
+          if (!breakWarningShown && remain <= 30) {
+            breakWarningShown = true;
+            progressCircle.style.stroke = "#e57373"; // red ring
+            ask(
+              "Break Ending Soon!",
+              "Your break is about to end in 30 seconds. Get ready to focus again!",
+              function () {}
+            );
+          }
+        }
+
+        updateTimeDisplay();
+      }
+
+      function startFocus() {
+        mode = "focus";
+        timerRunning = true;
+        pet.classList.add("active");
+        petFace.textContent = "🐶"; // normal happy when starting
+        progressCircle.style.stroke = "#f4a460";
+        btn.style.display = "block";
+        resumeRow.style.display = "none";
+        btn.textContent = "GIVE UP";
+        btn.className = "action-btn btn-giveup";
+
+        if (storedTaskName) {
+          modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> ${storedTaskName}`;
+        } else {
+          modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Study Mode`;
+        }
+
+        total = focusTotal;
+        remain = total;
+        setRing(0);
+        updateTimeDisplay();
+
+        clearInterval(interval);
+        interval = setInterval(tick, 1000);
+      }
+
+      function giveUp() {
+        clearInterval(interval);
+        timerRunning = false;
+        pet.classList.remove("active");
+        mode = "focus-paused";
+        btn.style.display = "none";
+        resumeRow.style.display = "flex";
+        petFace.textContent = "😢"; // sad when user gives up
+      }
+
+      function resumeFocus() {
+        mode = "focus";
+        timerRunning = true;
+        pet.classList.add("active");
+        petFace.textContent = "🐶"; // back to happy while focusing
+        btn.style.display = "block";
+        resumeRow.style.display = "none";
+        btn.textContent = "GIVE UP";
+        btn.className = "action-btn btn-giveup";
+        progressCircle.style.stroke = "#f4a460";
+
+        clearInterval(interval);
+        interval = setInterval(tick, 1000);
+      }
+
+      function abortSession() {
+        clearInterval(interval);
+        timerRunning = false;
+        pet.classList.remove("active");
+        resetToFocusIdle();
+      }
+
+      function onFocusComplete() {
+        clearInterval(interval);
+        timerRunning = false;
+        remain = 0;
+        updateTimeDisplay();
+        setRing(100);
+        pet.classList.remove("active");
+        petFace.textContent = "🥳"; // finished focus successfully
+        progressCircle.style.stroke = "#f4a460";
+
+        // ---- STREAK + STATS UPDATE ----
+        // 1) visual streak on timer header
+        streakCount += 1;
+        streakTextEl.textContent = streakCount + " Focus Streak";
+
+        // 2) count this focus block as a finished session
+        sessionCount += 1;
+
+        // 3) add duration in minutes (focusTotal is in seconds)
+        totalMinutes += Math.round(focusTotal / 60);
+
+        // 4) update best streak record
+        if (streakCount > bestStreak) {
+          bestStreak = streakCount;
+        }
+
+        // 5) save to localStorage so PROFILE can read it
+        localStorage.setItem(TOTAL_MINUTES_KEY, String(totalMinutes));
+        localStorage.setItem(SESSION_COUNT_KEY, String(sessionCount));
+        localStorage.setItem(BEST_STREAK_KEY, String(bestStreak));
+
+        // ---- EXISTING UI LOGIC ----
+        mode = "break-ready";
+        btn.style.display = "block";
+        resumeRow.style.display = "none";
+        btn.textContent = "START BREAK";
+        btn.className = "action-btn btn-start";
+        modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Break Ready`;
+      }
+
+      function startBreak() {
+        mode = "break";
+        timerRunning = true;
+        breakWarningShown = false;
+
+        const breakLen = getBreakLengthSeconds();
+        total = breakLen;
+        remain = breakLen;
+        progressCircle.style.stroke = "#f4a460";
+        setRing(0);
+        updateTimeDisplay();
+
+        pet.classList.add("active");
+        petFace.textContent = "🐶"; // relaxed happy during break
+
+        btn.style.display = "block";
+        btn.textContent = "END BREAK";
+        btn.className = "action-btn btn-giveup";
+        resumeRow.style.display = "none";
+
+        modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Break Time`;
+
+        clearInterval(interval);
+        interval = setInterval(tick, 1000);
+      }
+
+      function finishBreakToFocus() {
+        clearInterval(interval);
+        timerRunning = false;
+        pet.classList.remove("active");
+        petFace.textContent = "🥳"; // happy after finishing break
+        progressCircle.style.stroke = "#f4a460";
+
+        mode = "focus";
+        total = focusTotal;
+        remain = total;
+        setRing(0);
+        updateTimeDisplay();
+
+        btn.style.display = "block";
+        btn.textContent = "START";
+        btn.className = "action-btn btn-start";
+        resumeRow.style.display = "none";
+
+        if (storedTaskName) {
+          modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Great job! Next: ${storedTaskName}`;
+        } else {
+          modeTag.innerHTML = `<i class="fa-solid fa-circle"></i> Great job! Ready for next focus`;
+        }
+      }
+
+      function onBreakComplete() {
+        remain = 0;
+        updateTimeDisplay();
+        setRing(100);
+
+        ask(
+          "Break Finished!",
+          "Break is over. Ready to start another focus session?",
+          function () {
+            finishBreakToFocus();
+          }
+        );
+      }
+
+      btn.onclick = () => {
+        const text = btn.textContent;
+
+        if (mode === "focus" && text === "START") {
+          ask("Start Focus?", "Begin your focus session?", startFocus);
+        } else if (mode === "focus" && text === "GIVE UP") {
+          ask("Give Up?", "Stop your session now?", giveUp);
+        } else if (mode === "break-ready" && text === "START BREAK") {
+          ask(
+            "Start Break?",
+            "Start your break session based on your focus time?",
+            startBreak
+          );
+        } else if (mode === "break" && text === "END BREAK") {
+          ask(
+            "End Break?",
+            "Finish your break and go back to focus mode?",
+            finishBreakToFocus
+          );
+        }
+      };
+
+      resumeBtn.onclick = () => {
+        ask("Resume?", "Continue where you left off?", resumeFocus);
+      };
+
+      endBtn.onclick = () => {
+        ask("End Session?", "This will reset your session.", abortSession);
+      };
+
+      // Initial draw based on focusTotal (from localStorage or default)
+      updateTimeDisplay();
+      setRing(0);
+
+      /* ---------- MENU DRAWER LOGIC ---------- */
+      const menuBtn = document.getElementById("menuBtn");
+      const menuDrawer = document.getElementById("menuDrawer");
+      const menuOverlay = document.getElementById("menuOverlay");
+      const menuClose = document.getElementById("menuClose");
+      const menuHome = document.getElementById("menuHome");
+      const menuCalendar = document.getElementById("menuCalendar");
+      const menuProfile = document.getElementById("menuProfile");
+      const menuFriends = document.getElementById("menuFriends");
+      const menuShop = document.getElementById("menuShop");
+
+      function openMenu() {
+        menuDrawer.classList.add("open");
+      }
+      function closeMenu() {
+        menuDrawer.classList.remove("open");
+      }
+
+      menuBtn.addEventListener("click", openMenu);
+      menuClose.addEventListener("click", closeMenu);
+      menuOverlay.addEventListener("click", closeMenu);
+
+      // Back to timer = just close drawer
+      menuHome.addEventListener("click", () => {
+        closeMenu();
+      });
+
+      // Calendar navigation
+      menuCalendar.addEventListener("click", () => {
+        window.location.href = "calendar.html";
+      });
+
+      // Placeholder navs – you can later create these pages
+      menuProfile.addEventListener("click", () => {
+        window.location.href = "profile.html";
+      });
+      menuFriends.addEventListener("click", () => {
+        window.location.href = "friends.html";
+      });
+      menuShop.addEventListener("click", () => {
+        window.location.href = "petshop.html";
+      });
+    </script>
+  </body>
+</html>

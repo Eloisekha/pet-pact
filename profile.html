@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Pact - Profile</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+      body {
+        background: #e0e5ec;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .phone-frame {
+        width: 320px;
+        height: 640px;
+        background: #000;
+        border-radius: 36px;
+        padding: 10px;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      .phone-notch {
+        width: 130px;
+        height: 22px;
+        background: #000;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        z-index: 10;
+      }
+
+      .app-screen {
+        width: 100%;
+        height: 100%;
+        background: #b4c5e4;
+        border-radius: 28px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 28px 20px 10px; /* match calendar/header style */
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        font-weight: 800;
+        color: #2c3e50;
+        cursor: pointer;
+      }
+
+      .header-title {
+        flex: 1;
+        text-align: center;
+        font-size: 18px; /* align with CALENDAR title */
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: #2c3e50;
+        text-transform: uppercase;
+        margin-right: 20px; /* align arrow vs title */
+      }
+
+      .content {
+        flex: 1;
+        padding: 12px 20px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      /* HERO CARD */
+      .hero-card {
+        background: #fdfbf7;
+        border-radius: 22px;
+        padding: 18px 16px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar-row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #eedc82;
+        border: 4px solid #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+      }
+
+      .name-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .username {
+        font-size: 16px;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      .edit-name-btn {
+        background: none;
+        border: none;
+        font-size: 12px;
+        color: #4a5568;
+        cursor: pointer;
+      }
+
+      .name-input-row {
+        display: none;
+        gap: 6px;
+        margin-top: 4px;
+      }
+
+      .name-input {
+        flex: 1;
+        border-radius: 12px;
+        border: none;
+        padding: 6px 8px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #edf2f7;
+        color: #2c3e50;
+        outline: none;
+      }
+
+      .name-save-btn {
+        border: none;
+        border-radius: 12px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 800;
+        cursor: pointer;
+        background: #a8d5ba;
+        color: #2c3e50;
+      }
+
+      .hero-subtext {
+        font-size: 12px; /* slightly bigger to match calendar captions */
+        font-weight: 700;
+        color: #718096;
+        text-align: center;
+      }
+
+      /* STATS STRIP */
+      .stats-strip {
+        background: #fdfbf7;
+        border-radius: 18px;
+        padding: 10px 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 6px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+      }
+
+      .stat-block {
+        flex: 1;
+        text-align: center;
+      }
+
+      .stat-label {
+        font-size: 11px; /* match calendar section-label */
+        font-weight: 800;
+        color: #718096;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+
+      .stat-value {
+        font-size: 16px; /* slightly up for hierarchy */
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      /* PREFERENCES – SIMPLIFIED */
+      .prefs-card {
+        background: #fdfbf7;
+        border-radius: 18px;
+        padding: 14px 16px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .prefs-title {
+        font-size: 12px;
+        font-weight: 900;
+        color: #2c3e50;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .prefs-main-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .prefs-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #718096;
+      }
+
+      .prefs-highlight {
+        font-size: 14px;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      .prefs-note {
+        font-size: 10px;
+        font-weight: 700;
+        color: #a0aec0;
+      }
+
+      .chip-row {
+        display: flex;
+        gap: 6px;
+        margin-top: 2px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: 800;
+        background: #edf2f7;
+        color: #2c3e50;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="app-screen">
+        <div class="header-row">
+          <button class="back-btn" onclick="window.location.href='main.html';">
+            ←
+          </button>
+          <div class="header-title">PROFILE</div>
+        </div>
+
+        <div class="content">
+          <!-- HERO -->
+          <div class="hero-card">
+            <div class="avatar-row">
+              <div class="avatar-circle">
+                <span id="avatarEmoji">🐶</span>
+              </div>
+
+              <div class="name-row">
+                <span id="usernameDisplay" class="username">Focus Buddy</span>
+                <button id="editNameBtn" class="edit-name-btn">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              </div>
+
+              <div id="nameInputRow" class="name-input-row">
+                <input
+                  id="nameInput"
+                  class="name-input"
+                  type="text"
+                  maxlength="18"
+                  placeholder="Enter nickname"
+                />
+                <button id="nameSaveBtn" class="name-save-btn">Save</button>
+              </div>
+            </div>
+
+            <div class="hero-subtext">Your focus history with Pet Pact.</div>
+          </div>
+
+          <!-- STATS -->
+          <div class="stats-strip">
+            <div class="stat-block">
+              <div class="stat-label">Total focus</div>
+              <div id="totalFocusText" class="stat-value">0h 00m</div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label">Total Sessions</div>
+              <div id="sessionCountText" class="stat-value">0</div>
+            </div>
+            <div class="stat-block">
+              <div class="stat-label">Best streak</div>
+              <div id="bestStreakText" class="stat-value">0</div>
+            </div>
+          </div>
+
+          <!-- FOCUS PREFERENCES – SIMPLE -->
+          <div class="prefs-card">
+            <div class="prefs-title">Focus setup</div>
+
+            <div class="prefs-main-row">
+              <span class="prefs-label">Default session</span>
+              <span id="favSessionText" class="prefs-highlight">25 min</span>
+            </div>
+
+            <div id="favBreakText" class="prefs-note">Auto break: 5 min</div>
+
+            <div class="chip-row">
+              <div class="chip">Study Mode</div>
+              <div class="chip">Auto Break</div>
+              <div class="chip">Pop-up Alerts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ---- KEYS SHARED ACROSS APP ----
+      const NAME_KEY = "petpact_profile_name";
+      const TOTAL_MINUTES_KEY = "petpact_total_minutes";
+      const SESSION_COUNT_KEY = "petpact_session_count";
+      const BEST_STREAK_KEY = "petpact_best_streak";
+      const LAST_FOCUS_MIN_KEY = "petpact_taskMinutes"; // calendar/main already use this
+
+      const usernameDisplay = document.getElementById("usernameDisplay");
+      const editNameBtn = document.getElementById("editNameBtn");
+      const nameInputRow = document.getElementById("nameInputRow");
+      const nameInput = document.getElementById("nameInput");
+      const nameSaveBtn = document.getElementById("nameSaveBtn");
+
+      const totalFocusText = document.getElementById("totalFocusText");
+      const sessionCountText = document.getElementById("sessionCountText");
+      const bestStreakText = document.getElementById("bestStreakText");
+      const favSessionText = document.getElementById("favSessionText");
+      const favBreakText = document.getElementById("favBreakText");
+
+      // ---- NAME ----
+      const savedName = localStorage.getItem(NAME_KEY);
+      if (savedName && savedName.trim() !== "") {
+        usernameDisplay.textContent = savedName;
+      }
+
+      editNameBtn.addEventListener("click", () => {
+        nameInput.value = usernameDisplay.textContent;
+        nameInputRow.style.display = "flex";
+        nameInput.focus();
+      });
+
+      nameSaveBtn.addEventListener("click", () => {
+        const newName = nameInput.value.trim();
+        if (!newName) {
+          alert("Name cannot be empty.");
+          return;
+        }
+        usernameDisplay.textContent = newName;
+        localStorage.setItem(NAME_KEY, newName);
+        nameInputRow.style.display = "none";
+      });
+
+      // ---- STATS (from main.html) ----
+      const rawMinutes = parseInt(localStorage.getItem(TOTAL_MINUTES_KEY), 10);
+      const rawSessions = parseInt(localStorage.getItem(SESSION_COUNT_KEY), 10);
+      const rawBestStreak = parseInt(localStorage.getItem(BEST_STREAK_KEY), 10);
+
+      const minutes = !isNaN(rawMinutes) && rawMinutes > 0 ? rawMinutes : 0;
+      const sessions = !isNaN(rawSessions) && rawSessions > 0 ? rawSessions : 0;
+      const bestStreak =
+        !isNaN(rawBestStreak) && rawBestStreak > 0 ? rawBestStreak : 0;
+
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      totalFocusText.textContent =
+        String(hours) + "h " + String(mins).padStart(2, "0") + "m";
+      sessionCountText.textContent = sessions.toString();
+      bestStreakText.textContent = bestStreak.toString();
+
+      // ---- FOCUS PREFERENCES ----
+      const lastFocusMinStr = localStorage.getItem(LAST_FOCUS_MIN_KEY);
+      let defaultMinutes = 25;
+      if (lastFocusMinStr) {
+        const v = parseInt(lastFocusMinStr, 10);
+        if (!isNaN(v) && v > 0) defaultMinutes = v;
+      }
+      favSessionText.textContent = defaultMinutes + " min";
+
+      let breakText;
+      if (defaultMinutes < 5) {
+        breakText = "Auto break: 1 min";
+      } else if (defaultMinutes <= 25) {
+        breakText = "Auto break: 5 min";
+      } else {
+        breakText = "Auto break: 20 min";
+      }
+      favBreakText.textContent = breakText;
+    </script>
+  </body>
+</html>

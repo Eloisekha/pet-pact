@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Pact - Friends</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+
+      body {
+        background: #e0e5ec;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .phone-frame {
+        width: 320px;
+        height: 640px;
+        background: #000;
+        border-radius: 36px;
+        padding: 10px;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      .phone-notch {
+        width: 130px;
+        height: 22px;
+        background: #000;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        z-index: 10;
+      }
+
+      .app-screen {
+        width: 100%;
+        height: 100%;
+        background: #b4c5e4;
+        border-radius: 28px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* HEADER STRIP (simple, like main) */
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 26px 18px 6px;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        font-weight: 800;
+        color: #2c3e50;
+        cursor: pointer;
+      }
+
+      .header-title {
+        flex: 1;
+        text-align: center;
+        font-size: 17px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: #2c3e50;
+        text-transform: uppercase;
+        margin-right: 20px;
+      }
+
+      /* TOP FRIEND HERO CARD ------------------------------------------------ */
+      .top-card {
+        margin: 0 18px 6px;
+        background: linear-gradient(135deg, #f4a460, #eedc82);
+        border-radius: 20px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .top-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .top-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #ffffffcc;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .top-value {
+        font-size: 17px;
+        font-weight: 900;
+        color: #ffffff;
+      }
+
+      .top-note {
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff7dd;
+      }
+
+      .top-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .top-emoji-card {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: #fdfbf7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+      }
+
+      .top-chip {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.1);
+        font-size: 10px;
+        font-weight: 800;
+        color: #fdfbf7;
+      }
+
+      /* MAIN SCROLL CONTENT ------------------------------------------------- */
+      .content {
+        flex: 1;
+        padding: 8px 18px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+      }
+      .content::-webkit-scrollbar {
+        display: none;
+      }
+
+      .section-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* FRIEND LIST CARD ---------------------------------------------------- */
+      .friends-card {
+        background: #fdfbf7;
+        border-radius: 18px;
+        padding: 8px 10px 6px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .friends-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+      }
+
+      .friends-title {
+        font-size: 12px;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      .friends-count {
+        font-size: 11px;
+        font-weight: 700;
+        color: #718096;
+      }
+
+      .friends-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .friend-row {
+        border-radius: 12px;
+        padding: 6px 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: background 0.1s;
+      }
+
+      .friend-row.selectable {
+        cursor: pointer;
+      }
+
+      .friend-row.selected {
+        background: #edf2f7;
+      }
+
+      .friend-row.pending {
+        opacity: 0.7;
+      }
+
+      .friend-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .avatar-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #eedc82;
+        border: 2px solid #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .friend-text {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+      }
+
+      .friend-name {
+        font-size: 13px;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      .friend-sub {
+        font-size: 10px;
+        font-weight: 700;
+        color: #a0aec0;
+      }
+
+      .friend-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .streak-chip {
+        font-size: 11px;
+        font-weight: 800;
+        color: #2c3e50;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: #edf2f7;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .select-dot {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid #cbd5e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: #2c3e50;
+      }
+
+      .friend-row.selected .select-dot {
+        background: #2c3e50;
+        border-color: #2c3e50;
+        color: #fdfbf7;
+      }
+
+      /* ADD FRIEND ROW ------------------------------------------------------ */
+      .add-friend-row {
+        margin-top: 4px;
+        border-radius: 14px;
+        padding: 7px 9px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #fdfbf7;
+        cursor: pointer;
+      }
+
+      .add-friend-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .add-friend-icon {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #a8d5ba;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        color: #2c3e50;
+      }
+
+      .add-friend-text {
+        font-size: 12px;
+        font-weight: 800;
+        color: #2c3e50;
+      }
+
+      /* SESSION PANEL ------------------------------------------------------- */
+      .session-panel {
+        background: #fdfbf7;
+        border-radius: 18px;
+        padding: 10px 12px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .session-title {
+        font-size: 12px;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      .session-hint {
+        font-size: 10px;
+        font-weight: 700;
+        color: #718096;
+      }
+
+      .session-main-btn {
+        margin-top: 4px;
+        width: 100%;
+        padding: 10px;
+        border-radius: 22px;
+        border: none;
+        font-size: 13px;
+        font-weight: 900;
+        cursor: pointer;
+        background: #a8d5ba;
+        color: #2c3e50;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .session-actions-row {
+        display: none; /* shown after we tap SELECT FRIENDS */
+        margin-top: 4px;
+        gap: 8px;
+      }
+
+      .session-actions-row button {
+        flex: 1;
+        padding: 9px;
+        border-radius: 20px;
+        border: none;
+        font-size: 12px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .btn-create {
+        background: #eedc82;
+        color: #2c3e50;
+      }
+
+      .btn-schedule {
+        background: #f4a460;
+        color: #fdfbf7;
+      }
+
+      .btn-disabled {
+        opacity: 0.5;
+        cursor: default;
+        box-shadow: none;
+      }
+
+      /* POPUPS (same style as other screens) ------------------------------- */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(44, 62, 80, 0.55);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+      }
+      .popup-box {
+        background: #fdfbf7;
+        border-radius: 22px;
+        width: 280px;
+        padding: 22px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        animation: scalePop 0.25s;
+      }
+      @keyframes scalePop {
+        from {
+          transform: scale(0.8);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      .popup-box h3 {
+        font-size: 19px;
+        font-weight: 900;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+      .popup-box p {
+        font-size: 13px;
+        color: #4a5568;
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+
+      .popup-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .popup-btn {
+        flex: 1;
+        padding: 11px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .popup-yes {
+        background: #f4a460;
+        color: #fff;
+      }
+      .popup-no {
+        background: #e0e5ec;
+        color: #2c3e50;
+      }
+
+      .popup-input {
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: none;
+        background: #edf2f7;
+        font-size: 13px;
+        font-weight: 700;
+        color: #2c3e50;
+        outline: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="app-screen">
+        <div class="header-row">
+          <button class="back-btn" onclick="window.location.href='main.html';">
+            ←
+          </button>
+          <div class="header-title">FRIENDS</div>
+        </div>
+
+        <!-- top streak card -->
+        <div class="top-card">
+          <div class="top-left">
+            <span class="top-label">Your streak</span>
+            <span id="yourStreakValue" class="top-value">0🔥</span>
+          </div>
+
+          <div class="top-right">
+            <span id="friendCountChip" class="top-chip">0 friends</span>
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- friend list -->
+          <div class="section-label">Friend streaks</div>
+          <div class="friends-card">
+            <div class="friends-header-row">
+              <div class="friends-title">Friends</div>
+              <div id="friendsCountText" class="friends-count">0 active</div>
+            </div>
+            <div id="friendsList" class="friends-list"></div>
+          </div>
+
+          <!-- add friend row -->
+          <div id="addFriendRow" class="add-friend-row">
+            <div class="add-friend-left">
+              <div class="add-friend-icon">
+                <i class="fa-solid fa-user-plus"></i>
+              </div>
+              <span class="add-friend-text">Invite / add a friend</span>
+            </div>
+            <i
+              class="fa-solid fa-chevron-right"
+              style="font-size: 11px; color: #a0aec0"
+            ></i>
+          </div>
+
+          <!-- session panel -->
+          <!-- session panel -->
+          <div class="session-panel">
+            <div class="session-header">
+              <span class="session-title">Friend session</span>
+            </div>
+
+            <div id="sessionHint" class="session-hint">
+              1) Tap friends 2) Start or schedule together.
+            </div>
+
+            <button id="startSessionBtn" class="session-main-btn">
+              SELECT FRIENDS
+            </button>
+
+            <div id="sessionActionsRow" class="session-actions-row">
+              <button id="createSessionBtn" class="btn-create">
+                START NOW
+              </button>
+              <button id="scheduleSessionBtn" class="btn-schedule">
+                SCHEDULE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ---------- POPUPS ----------
+      function ask(title, msg, yesFn) {
+        const pop = document.createElement("div");
+        pop.className = "popup-overlay";
+        pop.innerHTML = `
+          <div class="popup-box">
+            <h3>${title}</h3>
+            <p>${msg}</p>
+            <div class="popup-actions">
+              <button class="popup-btn popup-yes">YES</button>
+              <button class="popup-btn popup-no">NO</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(pop);
+
+        const noBtn = pop.querySelector(".popup-no");
+        const yesBtn = pop.querySelector(".popup-yes");
+
+        noBtn.onclick = () => pop.remove();
+        yesBtn.onclick = () => {
+          if (yesFn) yesFn();
+          pop.remove();
+        };
+      }
+
+      function askInput(title, placeholder, yesFn) {
+        const pop = document.createElement("div");
+        pop.className = "popup-overlay";
+        pop.innerHTML = `
+          <div class="popup-box">
+            <h3>${title}</h3>
+            <input class="popup-input" type="text" placeholder="${placeholder}" />
+            <div class="popup-actions">
+              <button class="popup-btn popup-yes">ADD</button>
+              <button class="popup-btn popup-no">CANCEL</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(pop);
+
+        const input = pop.querySelector(".popup-input");
+        const noBtn = pop.querySelector(".popup-no");
+        const yesBtn = pop.querySelector(".popup-yes");
+
+        input.focus();
+
+        noBtn.onclick = () => pop.remove();
+        yesBtn.onclick = () => {
+          const value = input.value.trim();
+          if (value && yesFn) yesFn(value);
+          pop.remove();
+        };
+      }
+
+      // ---------- KEYS ----------
+      const BEST_STREAK_KEY = "petpact_best_streak";
+      const FRIENDS_KEY = "petpact_friends";
+      const SELECTED_FRIENDS_KEY = "petpact_selected_friends";
+
+      // ---------- ELEMENTS ----------
+      const yourStreakValueEl = document.getElementById("yourStreakValue");
+      const friendCountChipEl = document.getElementById("friendCountChip");
+      const friendsCountTextEl = document.getElementById("friendsCountText");
+      const friendsListEl = document.getElementById("friendsList");
+
+      const addFriendRowEl = document.getElementById("addFriendRow");
+
+      const sessionHintEl = document.getElementById("sessionHint");
+      const startSessionBtn = document.getElementById("startSessionBtn");
+      const sessionActionsRow = document.getElementById("sessionActionsRow");
+      const createSessionBtn = document.getElementById("createSessionBtn");
+      const scheduleSessionBtn = document.getElementById("scheduleSessionBtn");
+
+      // ---------- LOAD STREAK ----------
+      const rawBest = parseInt(localStorage.getItem(BEST_STREAK_KEY), 10);
+      const bestStreak = !isNaN(rawBest) && rawBest > 0 ? rawBest : 0;
+      yourStreakValueEl.textContent = bestStreak + "🔥";
+
+      // ---------- FRIEND DATA ----------
+      function defaultFriends() {
+        return [
+          { id: "maya", name: "Maya", emoji: "🐱", streak: 7, pending: false },
+          { id: "thu", name: "Thu", emoji: "🐰", streak: 5, pending: false },
+          { id: "qing", name: "Qing", emoji: "🦊", streak: 0, pending: true },
+        ];
+      }
+
+      let friends;
+      const storedFriends = localStorage.getItem(FRIENDS_KEY);
+      if (storedFriends) {
+        try {
+          friends = JSON.parse(storedFriends);
+        } catch (e) {
+          friends = defaultFriends();
+        }
+      } else {
+        friends = defaultFriends();
+      }
+
+      function saveFriends() {
+        localStorage.setItem(FRIENDS_KEY, JSON.stringify(friends));
+      }
+
+      // ---------- SELECTION STATE ----------
+      let selectingMode = false;
+      const selectedIds = new Set();
+
+      function updateFriendCounts() {
+        const activeCount = friends.filter((f) => !f.pending).length;
+        friendCountChipEl.textContent =
+          activeCount + " friend" + (activeCount === 1 ? "" : "s");
+        friendsCountTextEl.textContent = activeCount + " active";
+      }
+
+      function isSelected(id) {
+        return selectedIds.has(id);
+      }
+
+      function toggleSelection(id) {
+        if (!selectingMode) return;
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        renderFriends();
+        updateSessionButtonsEnabled();
+      }
+
+      function clearSelection() {
+        selectedIds.clear();
+        renderFriends();
+        updateSessionButtonsEnabled();
+      }
+
+      // ---------- RENDER FRIENDS ----------
+      function renderFriends() {
+        friendsListEl.innerHTML = "";
+
+        friends.forEach((f) => {
+          const row = document.createElement("div");
+          row.className = "friend-row";
+          if (f.pending) row.classList.add("pending");
+          if (selectingMode && !f.pending) row.classList.add("selectable");
+          if (isSelected(f.id)) row.classList.add("selected");
+
+          const left = document.createElement("div");
+          left.className = "friend-left";
+
+          const avatar = document.createElement("div");
+          avatar.className = "avatar-circle";
+          avatar.textContent = f.emoji || "🐶";
+
+          const textWrap = document.createElement("div");
+          textWrap.className = "friend-text";
+
+          const name = document.createElement("div");
+          name.className = "friend-name";
+          name.textContent = f.name;
+
+          const sub = document.createElement("div");
+          sub.className = "friend-sub";
+          sub.textContent = f.pending ? "Request pending" : "Ready to focus";
+
+          textWrap.appendChild(name);
+          textWrap.appendChild(sub);
+
+          left.appendChild(avatar);
+          left.appendChild(textWrap);
+
+          const right = document.createElement("div");
+          right.className = "friend-right";
+
+          const streakChip = document.createElement("div");
+          streakChip.className = "streak-chip";
+          streakChip.innerHTML = `<i class="fa-solid fa-fire"></i> ${f.streak}`;
+          right.appendChild(streakChip);
+
+          if (!f.pending) {
+            const dot = document.createElement("div");
+            dot.className = "select-dot";
+            if (isSelected(f.id)) {
+              dot.innerHTML = `<i class="fa-solid fa-check"></i>`;
+            }
+            right.appendChild(dot);
+          }
+
+          row.appendChild(left);
+          row.appendChild(right);
+
+          if (!f.pending) {
+            row.onclick = () => toggleSelection(f.id);
+          }
+
+          friendsListEl.appendChild(row);
+        });
+
+        updateFriendCounts();
+      }
+
+      // ---------- SESSION MODE ----------
+      function enterSelectingMode() {
+        selectingMode = true;
+        sessionHintEl.textContent =
+          "Tap friends to include them in this session.";
+        startSessionBtn.style.display = "none";
+        sessionActionsRow.style.display = "flex";
+        renderFriends();
+      }
+
+      function updateSessionButtonsEnabled() {
+        const hasSelection = selectedIds.size > 0;
+        [createSessionBtn, scheduleSessionBtn].forEach((btn) => {
+          if (hasSelection) {
+            btn.classList.remove("btn-disabled");
+          } else {
+            btn.classList.add("btn-disabled");
+          }
+        });
+      }
+
+      function getSelectedNames() {
+        const names = [];
+        friends.forEach((f) => {
+          if (selectedIds.has(f.id)) names.push(f.name);
+        });
+        return names;
+      }
+
+      // ---------- EVENTS ----------
+      startSessionBtn.addEventListener("click", () => {
+        enterSelectingMode();
+      });
+
+      createSessionBtn.addEventListener("click", () => {
+        if (selectedIds.size === 0) {
+          ask(
+            "No Friend Selected",
+            "Pick at least one friend to create a shared session.",
+            null
+          );
+          return;
+        }
+        const names = getSelectedNames();
+        const listText = names.join(", ");
+
+        ask(
+          "Session Created",
+          `Your session with ${listText} is ready.\nDo you want to go into the session now?`,
+          () => {
+            window.location.href = "main.html";
+          }
+        );
+      });
+
+      scheduleSessionBtn.addEventListener("click", () => {
+        if (selectedIds.size === 0) {
+          ask(
+            "No Friend Selected",
+            "Pick at least one friend before scheduling.",
+            null
+          );
+          return;
+        }
+        const names = getSelectedNames();
+        localStorage.setItem(SELECTED_FRIENDS_KEY, JSON.stringify(names));
+        window.location.href = "calendar.html";
+      });
+
+      addFriendRowEl.addEventListener("click", () => {
+        askInput("Add Friend", "Friend nickname", (nickname) => {
+          const newFriend = {
+            id: "friend_" + Date.now(),
+            name: nickname,
+            emoji: "🐶",
+            streak: 0,
+            pending: false,
+          };
+          friends.push(newFriend);
+          saveFriends();
+          renderFriends();
+        });
+      });
+      createSessionBtn.addEventListener("click", () => {
+        if (selectedIds.size === 0) {
+          ask(
+            "No Friend Selected",
+            "Pick at least one friend to start a session.",
+            null
+          );
+          return;
+        }
+
+        const names = getSelectedNames();
+        const sessionName = "Study with " + names.join(", ");
+
+        localStorage.setItem("petpact_sessionName", sessionName);
+
+        ask(
+          "Session Created",
+          `${sessionName} is ready.\nDo you want to go into the session now?`,
+          () => {
+            window.location.href = "main.html";
+          }
+        );
+      });
+
+      // ---------- INIT ----------
+      saveFriends();
+      renderFriends();
+      updateSessionButtonsEnabled();
+    </script>
+  </body>
+</html>

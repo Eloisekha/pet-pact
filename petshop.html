@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Pact - Pet Shop</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+      body {
+        background: #e0e5ec;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .phone-frame {
+        width: 320px;
+        height: 640px;
+        background: #000;
+        border-radius: 36px;
+        padding: 10px;
+        position: relative;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+      }
+
+      .phone-notch {
+        width: 130px;
+        height: 22px;
+        background: #000;
+        position: absolute;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        z-index: 10;
+      }
+
+      .app-screen {
+        width: 100%;
+        height: 100%;
+        background: #b4c5e4;
+        border-radius: 28px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 28px 20px 10px;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        font-weight: 800;
+        color: #2c3e50;
+        cursor: pointer;
+      }
+
+      .header-title {
+        flex: 1;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: #2c3e50;
+        text-transform: uppercase;
+        margin-right: 20px;
+      }
+
+      .content {
+        flex: 1;
+        padding: 10px 20px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto; /* make inside scrollable */
+      }
+      .content::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* SUMMARY CARD */
+      .summary-card {
+        background: #fdfbf7;
+        border-radius: 18px;
+        padding: 10px 14px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .summary-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .summary-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #718096;
+        text-transform: uppercase;
+      }
+
+      .summary-value {
+        font-size: 16px;
+        font-weight: 900;
+        color: #2c3e50;
+      }
+
+      .summary-note {
+        font-size: 11px;
+        font-weight: 700;
+        color: #a0aec0;
+      }
+
+      .summary-chip {
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: #edf2f7;
+        font-size: 10px;
+        font-weight: 800;
+        color: #2c3e50;
+      }
+
+      /* PET GRID */
+      .section-label {
+        font-size: 11px;
+        font-weight: 800;
+        color: #4a5568;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 4px;
+      }
+
+      .pets-grid {
+        margin-top: 6px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        /* grid itself can grow; outer .content scrolls */
+      }
+
+      .pet-card {
+        background: #fdfbf7;
+        border-radius: 16px;
+        padding: 10px 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .pet-emoji-circle {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: #eedc82;
+        border: 3px solid #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .pet-name {
+        font-size: 12px;
+        font-weight: 900;
+        color: #2c3e50;
+        text-align: center;
+      }
+
+      .pet-req {
+        font-size: 10px;
+        font-weight: 700;
+        color: #718096;
+      }
+
+      .pet-status {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .pet-status-unlocked {
+        color: #2f855a;
+      }
+
+      .pet-status-locked {
+        color: #c53030;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .pet-btn {
+        margin-top: 2px;
+        width: 100%;
+        border-radius: 999px;
+        border: none;
+        padding: 6px 0;
+        font-size: 11px;
+        font-weight: 800;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+
+      .pet-btn-use {
+        background: #a8d5ba;
+        color: #2c3e50;
+      }
+
+      .pet-btn-current {
+        background: #2c3e50;
+        color: #fdfbf7;
+      }
+
+      .pet-btn-locked {
+        background: #e2e8f0;
+        color: #a0aec0;
+      }
+
+      .pet-card.locked {
+        opacity: 0.7;
+      }
+
+      /* POPUP (same style as main.html) */
+      .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(44, 62, 80, 0.55);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+      }
+      .popup-box {
+        background: #fdfbf7;
+        border-radius: 22px;
+        width: 280px;
+        padding: 22px;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        animation: scalePop 0.25s;
+      }
+      @keyframes scalePop {
+        from {
+          transform: scale(0.8);
+        }
+        to {
+          transform: scale(1);
+        }
+      }
+
+      .popup-box h3 {
+        font-size: 19px;
+        font-weight: 900;
+        color: #2c3e50;
+        margin-bottom: 8px;
+      }
+      .popup-box p {
+        font-size: 13px;
+        color: #4a5568;
+        margin-bottom: 18px;
+        font-weight: 700;
+      }
+
+      .popup-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .popup-btn {
+        flex: 1;
+        padding: 11px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 900;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .popup-yes {
+        background: #f4a460;
+        color: #fff;
+      }
+      .popup-no {
+        background: #e0e5ec;
+        color: #2c3e50;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="app-screen">
+        <div class="header-row">
+          <button class="back-btn" onclick="window.location.href='main.html';">
+            ←
+          </button>
+          <div class="header-title">PET SHOP</div>
+        </div>
+
+        <div class="content">
+          <!-- SUMMARY -->
+          <div class="summary-card">
+            <div class="summary-left">
+              <span class="summary-label">Best streak</span>
+              <span id="bestStreakValue" class="summary-value">0</span>
+              <span id="unlockedSummary" class="summary-note">
+                Unlock pets as your streak grows.
+              </span>
+            </div>
+            <span id="activePetChip" class="summary-chip">Active: 🐶</span>
+          </div>
+
+          <div class="section-label">Your pets</div>
+
+          <div id="petsGrid" class="pets-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ---- GENERIC POPUP CONFIRM (same pattern as main.html) ----
+      function ask(title, msg, yesFn) {
+        const pop = document.createElement("div");
+        pop.className = "popup-overlay";
+        pop.innerHTML = `
+          <div class="popup-box">
+            <h3>${title}</h3>
+            <p>${msg}</p>
+            <div class="popup-actions">
+              <button class="popup-btn popup-yes">YES</button>
+              <button class="popup-btn popup-no">NO</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(pop);
+
+        const noBtn = pop.querySelector(".popup-no");
+        const yesBtn = pop.querySelector(".popup-yes");
+
+        noBtn.onclick = () => pop.remove();
+        yesBtn.onclick = () => {
+          if (yesFn) yesFn();
+          pop.remove();
+        };
+      }
+
+      // ---- SHARED KEYS ----
+      const BEST_STREAK_KEY = "petpact_best_streak";
+      const ACTIVE_PET_ID_KEY = "petpact_active_pet_id";
+      const ACTIVE_PET_EMOJI_KEY = "petpact_active_pet_emoji";
+
+      const bestStreakValueEl = document.getElementById("bestStreakValue");
+      const unlockedSummaryEl = document.getElementById("unlockedSummary");
+      const activePetChipEl = document.getElementById("activePetChip");
+      const petsGridEl = document.getElementById("petsGrid");
+
+      // ---- DATA MODEL ----
+      const pets = [
+        {
+          id: "mocha",
+          name: "Mocha the Pup",
+          emoji: "🐶",
+          requiredStreak: 0,
+        },
+        {
+          id: "luna",
+          name: "Luna the Cat",
+          emoji: "🐱",
+          requiredStreak: 3,
+        },
+        {
+          id: "bunbun",
+          name: "Bun Bun",
+          emoji: "🐰",
+          requiredStreak: 5,
+        },
+        {
+          id: "kitsu",
+          name: "Kitsu the Fox",
+          emoji: "🦊",
+          requiredStreak: 8,
+        },
+        {
+          id: "panda",
+          name: "Poki the Panda",
+          emoji: "🐼",
+          requiredStreak: 12,
+        },
+      ];
+
+      // ---- LOAD STREAK + ACTIVE PET ----
+      const rawBest = parseInt(localStorage.getItem(BEST_STREAK_KEY), 10);
+      const bestStreak = !isNaN(rawBest) && rawBest > 0 ? rawBest : 0;
+
+      let activePetId = localStorage.getItem(ACTIVE_PET_ID_KEY) || "mocha";
+      let activePetEmoji = localStorage.getItem(ACTIVE_PET_EMOJI_KEY) || "🐶";
+
+      bestStreakValueEl.textContent = bestStreak.toString();
+
+      // compute unlocked count
+      const unlockedCount = pets.filter(
+        (p) => bestStreak >= p.requiredStreak
+      ).length;
+      unlockedSummaryEl.textContent =
+        unlockedCount + " / " + pets.length + " pets unlocked";
+
+      // summary chip
+      activePetChipEl.textContent = "Active: " + activePetEmoji;
+
+      // ---- RENDER CARDS ----
+      function renderPets() {
+        petsGridEl.innerHTML = "";
+
+        pets.forEach((pet) => {
+          const unlocked = bestStreak >= pet.requiredStreak;
+          const isCurrent = pet.id === activePetId;
+
+          const card = document.createElement("div");
+          card.className = "pet-card";
+          if (!unlocked) {
+            card.classList.add("locked");
+          }
+
+          const avatar = document.createElement("div");
+          avatar.className = "pet-emoji-circle";
+          avatar.textContent = pet.emoji;
+
+          const name = document.createElement("div");
+          name.className = "pet-name";
+          name.textContent = pet.name;
+
+          const req = document.createElement("div");
+          req.className = "pet-req";
+          req.textContent = "Unlock at " + pet.requiredStreak + " streak";
+
+          const status = document.createElement("div");
+          status.classList.add("pet-status");
+          if (unlocked) {
+            status.classList.add("pet-status-unlocked");
+            status.textContent = "Unlocked";
+          } else {
+            status.classList.add("pet-status-locked");
+            status.innerHTML = '<i class="fa-solid fa-lock"></i> Locked';
+          }
+
+          const btn = document.createElement("button");
+          btn.classList.add("pet-btn");
+
+          if (!unlocked) {
+            // LOCKED: show reminder popup using same ask() style
+            btn.classList.add("pet-btn-locked");
+            btn.textContent = "Reach streak " + pet.requiredStreak;
+            btn.onclick = () => {
+              ask(
+                "Pet Locked",
+                `You need a streak of ${pet.requiredStreak} to unlock ${pet.name}.`,
+                null
+              );
+            };
+          } else if (isCurrent) {
+            // CURRENT ACTIVE PET
+            btn.classList.add("pet-btn-current");
+            btn.textContent = "Using";
+            // no action
+          } else {
+            // UNLOCKED BUT NOT ACTIVE → confirm change
+            btn.classList.add("pet-btn-use");
+            btn.textContent = "Use pet";
+            btn.onclick = () => {
+              ask(
+                "Switch Pet?",
+                `Set ${pet.name} as your active focus buddy?`,
+                () => {
+                  activePetId = pet.id;
+                  activePetEmoji = pet.emoji;
+                  localStorage.setItem(ACTIVE_PET_ID_KEY, activePetId);
+                  localStorage.setItem(ACTIVE_PET_EMOJI_KEY, activePetEmoji);
+                  activePetChipEl.textContent = "Active: " + activePetEmoji;
+                  renderPets();
+                }
+              );
+            };
+          }
+
+          card.appendChild(avatar);
+          card.appendChild(name);
+          card.appendChild(req);
+          card.appendChild(status);
+          card.appendChild(btn);
+
+          petsGridEl.appendChild(card);
+        });
+      }
+
+      renderPets();
+    </script>
+  </body>
+</html>

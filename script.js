@@ -31,4 +31,92 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "screen3.html";
     });
   }
+  // --- SCREEN 3: DASHBOARD LOGIC ---
+  const timerDisplay = document.getElementById("timerDisplay");
+
+  if (timerDisplay) {
+    let timeLeft = 25 * 60; // 25 Minutes
+    let timerInterval = null;
+    let isRunning = false;
+
+    const actionBtn = document.getElementById("actionBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const backBtn = document.getElementById("backBtn");
+    const modal = document.getElementById("modalOverlay");
+    const modalConfirm = document.getElementById("modalConfirm");
+    const modalCancel = document.getElementById("modalCancel");
+    const statusText = document.getElementById("statusText");
+
+    // Format MM:SS
+    function updateDisplay() {
+      const m = Math.floor(timeLeft / 60);
+      const s = timeLeft % 60;
+      timerDisplay.textContent = `${m.toString().padStart(2, "0")}:${s
+        .toString()
+        .padStart(2, "0")}`;
+    }
+
+    // 1. START / PAUSE
+    actionBtn.addEventListener("click", () => {
+      if (isRunning) {
+        // Pause
+        clearInterval(timerInterval);
+        isRunning = false;
+        actionBtn.textContent = "Resume";
+        statusText.textContent = "Session Paused";
+      } else {
+        // Start
+        isRunning = true;
+        actionBtn.textContent = "Pause";
+        statusText.textContent = "Stay Focused...";
+
+        timerInterval = setInterval(() => {
+          if (timeLeft > 0) {
+            timeLeft--;
+            updateDisplay();
+          } else {
+            // Timer Finished
+            clearInterval(timerInterval);
+            isRunning = false;
+            alert("Session Finished! Time for a Break."); // Simplified alert for demo
+            timeLeft = 5 * 60; // Set Break time
+            statusText.textContent = "Break Time";
+            updateDisplay();
+            actionBtn.textContent = "Start Break";
+          }
+        }, 1000); // 1000ms = 1 second
+      }
+    });
+
+    // 2. STOP BUTTON -> OPEN MODAL
+    stopBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+    });
+
+    // 3. MODAL ACTIONS
+    modalCancel.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+
+    modalConfirm.addEventListener("click", () => {
+      // Reset everything
+      clearInterval(timerInterval);
+      isRunning = false;
+      timeLeft = 25 * 60;
+      updateDisplay();
+      actionBtn.textContent = "Start Focus";
+      statusText.textContent = "Focus Session";
+      modal.classList.add("hidden");
+    });
+
+    // 4. BACK BUTTON
+    backBtn.addEventListener("click", () => {
+      // Confirm if timer is running?
+      if (isRunning) {
+        modal.classList.remove("hidden"); // Use the same modal for safety
+      } else {
+        window.location.href = "screen2.html";
+      }
+    });
+  }
 });
